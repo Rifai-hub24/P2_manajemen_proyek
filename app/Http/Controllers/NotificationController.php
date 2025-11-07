@@ -33,7 +33,7 @@ class NotificationController extends Controller
 
         // 🔹 Ambil notifikasi aktif (yang belum disilang)
         $blockers = Subtask::with('card.board.project')
-            ->where('is_blocked', true)
+            ->where('is_blocked', 1)
             ->whereNotIn('subtask_id', $dismissedIds)
             ->whereHas('card.board.project.members', fn($q) => $q->where('user_id', $user->user_id))
             ->get();
@@ -92,7 +92,7 @@ class NotificationController extends Controller
 
     private function countRemaining($user, $dismissedIds)
     {
-        $countBlockers = Subtask::where('is_blocked', true)
+        $countBlockers = Subtask::where('is_blocked', 1)
             ->whereNotIn('subtask_id', $dismissedIds)
             ->whereHas('card.board.project.members', fn($q) => $q->where('user_id', $user->user_id))
             ->count();
