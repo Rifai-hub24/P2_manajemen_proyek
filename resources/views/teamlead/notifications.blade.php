@@ -152,7 +152,6 @@
     {{-- 🔹 Subtask Terhambat --}}
     @forelse($blockers as $b)
     <div class="notif-card" id="notif-subtask-{{ $b->subtask_id }}">
-      <button class="close-btn" onclick="dismiss('subtask', {{ $b->subtask_id }})">&times;</button>
       <strong>⚠️ Subtask Terhambat:</strong> {{ $b->subtask_title }}
       @if($b->card)
       <div class="notif-meta"><i class="bi bi-kanban"></i> Card: <span class="fw-semibold text-dark">{{ $b->card->card_title }}</span></div>
@@ -168,7 +167,6 @@
     {{-- 🔹 Subtask Menunggu Review --}}
     @foreach($reviews as $r)
     <div class="notif-card" id="notif-subtask-{{ $r->subtask_id }}">
-      <button class="close-btn" onclick="dismiss('subtask', {{ $r->subtask_id }})">&times;</button>
       <strong>⏳ Subtask Menunggu Review:</strong> {{ $r->subtask_title }}
       @if($r->card)
       <div class="notif-meta"><i class="bi bi-kanban"></i> Card: <span class="fw-semibold text-dark">{{ $r->card->card_title }}</span></div>

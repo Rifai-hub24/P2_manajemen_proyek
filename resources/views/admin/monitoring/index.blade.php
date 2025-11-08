@@ -411,6 +411,24 @@
       gap: 16px;
     }
   }
+  /* === HP MODE (≤576px) === */
+  @media (max-width: 576px) {
+    .page-title {
+        margin-left: 10px; /* geser ke kiri */
+    }
+
+    .search-box {
+        width: 100%;      /* biar search box tetap penuh tapi mengikuti container */
+        max-width: 280px; /* tetap batasi maksimal */
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;        /* jarak antar elemen */
+    }
+}
+
  
   </style>
 </head>

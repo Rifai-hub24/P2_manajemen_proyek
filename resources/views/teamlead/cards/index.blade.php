@@ -387,6 +387,16 @@
       font-size: 0.9rem;
     }
   }
+  .flip-card-front p {
+    white-space: normal;        /* biar teks turun ke bawah */
+    word-wrap: break-word;      /* potong kata panjang */
+    overflow: hidden;           /* sembunyikan sisanya */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;      /* batasi 3 baris */
+    -webkit-box-orient: vertical;
+    line-height: 1.4rem;
+  }
+
 
   </style>
 </head>
@@ -448,6 +458,11 @@
             <div class="flip-card-front">
               <div>
                 <h5>{{ $card->card_title }}</h5>
+                @php
+                  $desc = $card->description ?? '-';
+                  $shortDesc = Str::limit($desc, 100, '...');
+                @endphp
+
                 <p>
                   {!! nl2br(preg_replace(
                     '/(https?:\/\/[^\s]+)/',

@@ -293,17 +293,15 @@
     }
 
     .project-desc {
-      color: var(--text-muted);
-      font-size: 0.92rem;
-      line-height: 1.5;
-      margin: 0.6rem 0 1.2rem;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      min-height: 4.2em;
-    }
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.5;
+    margin: 0.6rem 0 1.2rem;
+    max-width: 40ch;      /* maksimal 40 karakter per baris */
+    white-space: normal;   /* teks bisa wrap ke bawah */
+    word-wrap: break-word; /* kata panjang dipotong ke baris baru */
+    overflow-wrap: break-word;
+}
 
     /* Footer tombol card */
     .card-footer {

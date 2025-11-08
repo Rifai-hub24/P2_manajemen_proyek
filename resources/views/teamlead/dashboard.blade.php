@@ -508,6 +508,21 @@
         flex-shrink: 0;
       }
     }
+    .project-description {
+      max-height: 4.5em; /* kira-kira 3 baris */
+      overflow: hidden;
+      position: relative;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;       /* tampil 3 baris dulu */
+      -webkit-box-orient: vertical;
+      word-break: break-word;      /* potong kata panjang */
+      white-space: normal;         /* biar turun ke bawah */
+    }
+    .project-description.expanded {
+      max-height: none;
+      -webkit-line-clamp: unset;
+    }
+
 
   </style>
 </head>
@@ -607,13 +622,13 @@
             <div class="flip-card-front">
               <div>
                 <h5>{{ $project->project_name }}</h5>
-                <p class="text-muted">
+                <div class="text-muted project-description">
                   {!! nl2br(preg_replace(
                     '/(https?:\/\/[^\s]+)/',
                     '<a href="$1" target="_blank" class="desc-link">$1</a>',
                     e($project->description ?? 'Tidak ada deskripsi')
                   )) !!}
-                </p>
+                </div>
 
                 <div class="info-line"><strong>Deadline:</strong> {{ $project->deadline ? \Carbon\Carbon::parse($project->deadline)->format('d-m-Y') : '-' }}</div>
                 <div class="info-line"><strong>Status:</strong>

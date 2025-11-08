@@ -39,6 +39,13 @@
       margin-bottom: 40px;
       position: relative;
     }
+    .project-header p {
+      white-space: pre-wrap;     /* biar baris baru di database tetap muncul */
+      word-wrap: break-word;     /* supaya kata panjang terpotong ke bawah */
+      max-width: 100%;           /* pastikan tidak meluber ke samping */
+      line-height: 1.2;          /* jarak antarbaris biar rapi */
+      overflow-wrap: break-word; /* pecah kata panjang ke baris baru */
+    }
 
     .project-header h1 {
       font-weight: 700;
