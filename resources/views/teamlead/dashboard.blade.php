@@ -744,5 +744,25 @@ document.addEventListener("DOMContentLoaded", function() {
       card.classList.toggle('flipped');
     }
   </script>
+  <script>
+  // Dapatkan path URL saat ini
+  const currentPath = window.location.pathname;
+
+  // Jika sedang di halaman dashboard utama
+  if (currentPath === '/dashboard') {
+      // Tambahkan state supaya tombol back bisa terdeteksi
+      window.history.pushState(null, '', window.location.href);
+
+      // Saat tombol back ditekan, arahkan ke halaman login
+      window.onpopstate = function () {
+          window.location.href = "{{ route('login') }}";
+      };
+  }
+  // Jika bukan di dashboard (misal di monitoring, laporan, dll)
+  else {
+      // Biarkan tombol back berfungsi normal
+      window.onpopstate = null;
+  }
+</script>
 </body>
 </html>
