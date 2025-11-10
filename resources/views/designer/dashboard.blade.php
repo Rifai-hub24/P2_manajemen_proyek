@@ -734,19 +734,6 @@ document.addEventListener("DOMContentLoaded", function() {
   setInterval(updateDevNotif, 30000);
 });
 </script>
-<script>
-  // Jika user sedang di halaman dashboard lalu menekan tombol Back,
-  // langsung arahkan ke halaman login
-  window.addEventListener('popstate', function() {
-      window.location.href = "{{ route('login') }}";
-  });
-
-  // Cegah halaman dashboard ditampilkan dari cache setelah logout
-  window.history.pushState(null, "", window.location.href);
-  window.onpopstate = function() {
-      window.location.href = "{{ route('login') }}";
-  };
-</script>
 
 </body>
 </html>
