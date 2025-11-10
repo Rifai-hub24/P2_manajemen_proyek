@@ -867,6 +867,27 @@ document.addEventListener("DOMContentLoaded", function() {
   setInterval(updateAdminNotif, 30000);
 });
 </script>
+<script>
+  // Dapatkan path URL saat ini
+  const currentPath = window.location.pathname;
+
+  // Jika sedang di halaman dashboard utama
+  if (currentPath === '/dashboard') {
+      // Tambahkan state supaya tombol back bisa terdeteksi
+      window.history.pushState(null, '', window.location.href);
+
+      // Saat tombol back ditekan, arahkan ke halaman login
+      window.onpopstate = function () {
+          window.location.href = "{{ route('login') }}";
+      };
+  }
+  // Jika bukan di dashboard (misal di monitoring, laporan, dll)
+  else {
+      // Biarkan tombol back berfungsi normal
+      window.onpopstate = null;
+  }
+</script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
