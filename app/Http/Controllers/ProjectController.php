@@ -362,11 +362,11 @@ public function destroy(Project $project)
     // 🔹 Ambil semua member beserta user
     $members = $project->members()->with('user')->get();
 
-    // 🔹 Reset status user ke idle (kecuali admin)
-    foreach ($members as $member) {
-        if ($member->user && $member->user->role !== 'admin') {
-            $member->user->update(['current_task_status' => 'idle']);
-        }
+    // 🔹 Reset semua user (termasuk admin) jadi idle  
+    foreach ($members as $member) {  
+        if ($member->user) {  
+            $member->user->update(['current_task_status' => 'idle']);  
+        }  
     }
 
     // 🔹 Hapus boards & members
