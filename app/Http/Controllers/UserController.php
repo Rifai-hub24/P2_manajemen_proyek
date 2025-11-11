@@ -89,31 +89,21 @@ class UserController extends Controller
      * Hapus user (admin tidak bisa hapus sesama admin)
      */
     public function destroy(User $user)
-{
-    $currentUser = Auth::user();
+    {
+        $currentUser = Auth::user();
 
-    // Cegah admin hapus sesama admin atau diri sendiri
-    if ($currentUser->role === 'admin' && $user->role === 'admin') {
-        return back()->with('error', '🚫 Anda tidak dapat menghapus sesama admin.');
+        // Cegah admin hapus admin
+        if ($currentUser->role === 'admin' && $user->role === 'admin') {
+            return back()->with('error', '🚫 Anda tidak dapat menghapus sesama admin.');
+        }
+
+        // Cegah admin hapus diri sendiri
+        if ($currentUser->user_id === $user->user_id) {
+            return back()->with('error', '⚠️ Anda tidak dapat menghapus diri sendiri.');
+        }
+
+        $user->delete();
+
+        return back()->with('success', "🗑️ User {$user->username} berhasil dihapus.");
     }
-
-    if ($currentUser->user_id === $user->user_id) {
-        return back()->with('error', '⚠️ Anda tidak dapat menghapus diri sendiri.');
-    }
-
-    // 🔥 Hapus semua card assignment milik user
-    \App\Models\CardAssignment::where('user_id', $user->user_id)->delete();
-
-    // 🔥 Hapus semua card yang dibuat user (jika ingin ikut dihapus)
-    \App\Models\Card::where('created_by', $user->user_id)->delete();
-
-    // 🔥 Hapus semua project_member milik user
-    \App\Models\ProjectMember::where('user_id', $user->user_id)->delete();
-
-    // 🔥 Hapus user
-    $user->delete();
-
-    return back()->with('success', "🗑️ User {$user->username} berhasil dihapus meskipun masih working.");
-}
-
 }
