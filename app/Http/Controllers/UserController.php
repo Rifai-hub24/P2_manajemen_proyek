@@ -59,5 +59,50 @@ class UserController extends Controller
         return view('admin.users.active', compact('users'));
     }
 
-   
+    /**
+     * Update role user (admin tidak boleh ubah admin)
+     */
+    public function updateRole(Request $request, User $user)
+    {
+        $request->validate([
+            'role' => 'required|in:admin,team_lead,developer,designer',
+        ]);
+
+        $currentUser = Auth::user();
+
+        // Cegah admin edit sesama admin
+        if ($currentUser->role === 'admin' && $user->role === 'admin') {
+            return back()->with('error', '🚫 Anda tidak dapat mengubah role sesama admin.');
+        }
+
+        // Cegah admin ubah dirinya sendiri
+        if ($currentUser->user_id === $user->user_id) {
+            return back()->with('error', '⚠️ Anda tidak dapat mengubah role diri sendiri.');
+        }
+
+        $user->update(['role' => $request->role]);
+
+        return back()->with('success', "✅ Role user {$user->username} berhasil diubah menjadi {$request->role}");
+    }
+
+    /**
+     * Hapus user (admin tidak bisa hapus sesama admin)
+     */
+    public function destroy(User $user)
+    {
+        $currentUser = Auth::user();
+
+        // Cegah admin hapus admin
+        if ($currentUser->role === 'admin' && $user->role === 'admin') {
+            return back()->with('error', '🚫 Anda tidak dapat menghapus sesama admin.');
+        }
+
+         if ($currentUser->user_id === $user->user_id) {
+        return back()->with('error', '⚠️ Anda tidak dapat menghapus diri sendiri.');
+    }
+
+        $user->delete();
+
+        return back()->with('success', "🗑️ User {$user->username} berhasil dihapus.");
+    }
 }
