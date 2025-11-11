@@ -753,18 +753,18 @@
                   <i class="bi bi-person-plus"></i>
                 </a>
 
-                <a href="{{ route('projects.edit',$project->project_id) }}" class="btn btn-warning btn-sm btn-modern" title="Edit">
-  <i class="bi bi-pencil-square"></i>
-</a>
-
-<form action="{{ route('projects.destroy',$project->project_id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus proyek ini?')" style="display:inline;">
-  @csrf
-  @method('DELETE')
-  <button type="submit" class="btn btn-danger btn-sm btn-modern" title="Hapus">
-    <i class="bi bi-trash"></i>
-  </button>
-</form>
-
+                @if($project->status !== 'approved')
+                  <a href="{{ route('projects.edit',$project->project_id) }}" class="btn btn-warning btn-sm btn-modern" title="Edit">
+                    <i class="bi bi-pencil-square"></i>
+                  </a>
+                  <form action="{{ route('projects.destroy',$project->project_id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus proyek ini?')" style="display:inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger btn-sm btn-modern" title="Hapus">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                @endif
 
                 @if($project->status == 'pending')
                   <form action="{{ route('projects.approve',$project->project_id) }}" method="POST" style="display:inline;">
