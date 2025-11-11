@@ -358,15 +358,20 @@
               </div>
             @endif
 
-            <form action="{{ route('users.destroy', $user->user_id) }}" method="POST"
-      onsubmit="return confirm('Yakin ingin menghapus user {{ $user->username }}?')" class="mt-auto">
-  @csrf
-  @method('DELETE')
-  <button type="submit" class="btn btn-delete w-100 btn-modern">
-    <i class="bi bi-trash"></i> Hapus User
-  </button>
-</form>
-
+            @if(!(Auth::user()->role == 'admin' && $user->role == 'admin'))
+              <form action="{{ route('users.destroy', $user->user_id) }}" method="POST"
+                    onsubmit="return confirm('Yakin ingin menghapus user {{ $user->username }}?')" class="mt-auto">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-delete w-100 btn-modern">
+                  <i class="bi bi-trash"></i> Hapus User
+                </button>
+              </form>
+            @else
+              <button class="btn btn-secondary btn-sm w-100 mt-auto" disabled>
+                <i class="bi bi-lock"></i> Tidak bisa hapus admin lain
+              </button>
+            @endif
           </div>
         </div>
       @empty

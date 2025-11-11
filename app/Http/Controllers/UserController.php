@@ -88,24 +88,22 @@ class UserController extends Controller
     /**
      * Hapus user (admin tidak bisa hapus sesama admin)
      */
-    /**
- * Hapus user (admin bisa hapus admin lain, tapi tidak bisa hapus diri sendiri)
- */
-public function destroy(User $user)
-{
-    $currentUser = Auth::user();
+    public function destroy(User $user)
+    {
+        $currentUser = Auth::user();
 
-    if ($currentUser->user_id === $user->user_id) {
-        return back()->with('error', '⚠️ Anda tidak dapat menghapus diri sendiri.');
+        // Cegah admin hapus admin
+        if ($currentUser->role === 'admin' && $user->role === 'admin') {
+            return back()->with('error', '🚫 Anda tidak dapat menghapus sesama admin.');
+        }
+
+        // Cegah admin hapus diri sendiri
+        if ($currentUser->user_id === $user->user_id) {
+            return back()->with('error', '⚠️ Anda tidak dapat menghapus diri sendiri.');
+        }
+
+        $user->delete();
+
+        return back()->with('success', "🗑️ User {$user->username} berhasil dihapus.");
     }
-
-    // Hapus semua project yang dibuat oleh user tersebut
-    $user->projects()->delete();
-
-    $user->delete();
-
-    return back()->with('success', "🗑️ User {$user->username} dan semua project miliknya berhasil dihapus.");
-}
-
-
 }

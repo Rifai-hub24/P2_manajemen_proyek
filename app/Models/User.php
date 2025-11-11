@@ -50,9 +50,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(TimeLog::class, 'user_id', 'user_id');
     }
-    public function projects()
-{
-    return $this->hasMany(Project::class, 'created_by');
-}
-
 }
