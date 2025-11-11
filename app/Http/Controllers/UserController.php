@@ -88,21 +88,21 @@ class UserController extends Controller
     /**
      * Hapus user (admin tidak bisa hapus sesama admin)
      */
-    public function destroy(User $user)
-    {
-        $currentUser = Auth::user();
+    /**
+ * Hapus user (admin bisa hapus admin lain, tapi tidak bisa hapus diri sendiri)
+ */
+public function destroy(User $user)
+{
+    $currentUser = Auth::user();
 
-        // Cegah admin hapus admin
-        if ($currentUser->role === 'admin' && $user->role === 'admin') {
-            return back()->with('error', '🚫 Anda tidak dapat menghapus sesama admin.');
-        }
-
-         if ($currentUser->user_id === $user->user_id) {
+    // Cegah admin hapus diri sendiri
+    if ($currentUser->user_id === $user->user_id) {
         return back()->with('error', '⚠️ Anda tidak dapat menghapus diri sendiri.');
     }
 
-        $user->delete();
+    $user->delete();
 
-        return back()->with('success', "🗑️ User {$user->username} berhasil dihapus.");
-    }
+    return back()->with('success', "🗑️ User {$user->username} berhasil dihapus.");
+}
+
 }
