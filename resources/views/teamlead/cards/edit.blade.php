@@ -304,6 +304,14 @@
     </div>
   </div>
 
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const today = new Date().toISOString().split("T")[0];
+      const dateInput = document.querySelector('input[name="due_date"]');
+      dateInput.setAttribute("min", today);
+    });
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
