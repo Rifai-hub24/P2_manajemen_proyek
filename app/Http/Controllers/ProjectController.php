@@ -353,9 +353,7 @@ public function destroy(Project $project)
 {
     if (auth()->user()->role !== 'admin') abort(403);
 
-    if ($project->status === 'approved') {
-        return redirect()->route('dashboard')->with('error', '❌ Project sudah approved, tidak bisa dihapus.');
-    }
+   
 
     $projectName = $project->project_name;
 
