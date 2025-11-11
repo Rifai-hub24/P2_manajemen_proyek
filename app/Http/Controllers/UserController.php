@@ -95,14 +95,17 @@ public function destroy(User $user)
 {
     $currentUser = Auth::user();
 
-    // Cegah admin hapus diri sendiri
     if ($currentUser->user_id === $user->user_id) {
         return back()->with('error', '⚠️ Anda tidak dapat menghapus diri sendiri.');
     }
 
+    // Hapus semua project yang dibuat oleh user tersebut
+    $user->projects()->delete();
+
     $user->delete();
 
-    return back()->with('success', "🗑️ User {$user->username} berhasil dihapus.");
+    return back()->with('success', "🗑️ User {$user->username} dan semua project miliknya berhasil dihapus.");
 }
+
 
 }
