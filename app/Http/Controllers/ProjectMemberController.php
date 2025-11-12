@@ -66,6 +66,19 @@ class ProjectMemberController extends Controller
     public function updateUser(Request $request, $memberId)
 {
     $member = ProjectMember::with('project')->findOrFail($memberId);
+    // ❌ Jika yang mau diedit adalah admin, pastikan hanya bisa diganti dengan admin lain
+    if ($member->user->role === 'admin') {
+        $newUser = User::where('username', $request->username)->first();
+
+        if (!$newUser) {
+            return back()->with('error', '❌ User tidak ditemukan.');
+        }
+
+        // Jika user baru bukan admin → tolak
+        if ($newUser->role !== 'admin') {
+            return back()->with('error', '🚫 Admin hanya bisa diganti dengan user ber-role admin.');
+        }
+    }
     
     // ❌ Cek jika ada subtask in_progress di project ini
     $hasStarted = Subtask::whereHas('card.board', function($q) use ($member) {
@@ -144,6 +157,10 @@ class ProjectMemberController extends Controller
     public function deleteMember($memberId)
     {
         $member = ProjectMember::with(['project', 'user'])->findOrFail($memberId);
+        // ❌ Cegah penghapusan admin
+        if ($member->user->role === 'admin') {
+            return back()->with('error', '🚫 Admin tidak dapat dihapus dari proyek.');
+        }
         // ❌ Cek jika ada subtask in_progress di project ini
         $hasStarted = Subtask::whereHas('card.board', function($q) use ($member) {
             $q->where('project_id', $member->project->project_id);
