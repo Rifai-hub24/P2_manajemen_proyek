@@ -120,11 +120,32 @@ Route::middleware(['auth','role:team_lead'])->group(function () {
 | DEVELOPER & DESIGNER ROUTES
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth','role:developer,designer'])->group(function() {
-    // Dashboard
-    Route::get('/developer/dashboard', [ProjectController::class, 'developerDashboard'])->name('developer.dashboard');
-    Route::get('/designer/dashboard', [ProjectController::class, 'designerDashboard'])->name('designer.dashboard');
+Route::middleware(['auth', 'role:developer'])->group(function () {
 
+    Route::get('/developer/dashboard',
+        [ProjectController::class, 'developerDashboard']
+    )->name('developer.dashboard');
+
+    Route::get('/developer/myteam',
+        [ProjectMemberController::class, 'developerTeam']
+    )->name('developer.myteam');
+
+});
+
+Route::middleware(['auth', 'role:designer'])->group(function () {
+
+    Route::get('/designer/dashboard',
+        [ProjectController::class, 'designerDashboard']
+    )->name('designer.dashboard');
+
+    Route::get('/designer/myteam',
+        [ProjectMemberController::class, 'designerTeam']
+    )->name('designer.myteam');
+
+});
+
+Route::middleware(['auth','role:developer,designer'])->group(function() {
+   
      // Halaman buat subtask (create)
     Route::get('/cards/{card}/subtasks/create', [SubtaskController::class, 'create'])->name('subtasks.create');
 
@@ -140,8 +161,6 @@ Route::middleware(['auth','role:developer,designer'])->group(function() {
     Route::post('/subtasks/{subtask}/block', [SubtaskController::class, 'block'])->name('subtasks.block');
 
     // Developer melihat tim yang satu project
-    Route::get('/developer/myteam', [ProjectMemberController::class, 'developerTeam'])->name('developer.myteam');
-    Route::get('/designer/myteam', [ProjectMemberController::class, 'designerTeam'])->name('designer.myteam');
     Route::get('/notifications/subtasks', [DevNotifController::class, 'index'])->name('dev.notifications');
     Route::post('/notifications/dismiss', [DevNotifController::class, 'dismiss'])->name('dev.notifications.dismiss');
     Route::get('/notifications/count', [DevNotifController::class, 'count'])->name('dev.notifications.count');
