@@ -245,6 +245,7 @@ public function submit($projectId)
     }
 
     $project->status = 'pending';
+    $project->submitted_at = now();
     $project->rejection_reason = null; // reset alasan reject saat dikirim ulang
     $project->save();
 

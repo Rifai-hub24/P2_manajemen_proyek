@@ -38,78 +38,60 @@ class Project extends Model
     }
 
     // ✅ Accessor status deadline
-    public function getDeadlineStatusAttribute()
-    {
-        // Draft / Rejected = Belum dikirim
-        if (in_array($this->status, ['draft', 'rejected'])) {
-            return 'Belum Dikirim';
-        }
+   public function getDeadlineStatusAttribute()
+{
+    if ($this->status === 'draft') return 'Belum Dikirim';
+    if (!$this->deadline) return 'Tidak Ada Deadline';
 
-        if (empty($this->deadline)) {
-            return 'Tidak Ada Deadline';
-        }
+    $deadline = Carbon::parse($this->deadline);
+    $submitted = $this->submitted_at ? Carbon::parse($this->submitted_at) : null;
 
-        // Pending = Menunggu persetujuan
-        if ($this->status === 'pending') {
-            return 'Menunggu Persetujuan';
-        }
+    if ($this->status === 'pending') return 'Menunggu Persetujuan';
 
-        $deadline = Carbon::parse($this->deadline);
-        $created = Carbon::parse($this->created_at);
-        $today = Carbon::now();
-
-        // ✅ Jika sudah approved
-        if ($this->status === 'approved') {
-            // Jika proyek dibuat atau diserahkan setelah deadline → Terlambat
-            if ($created->gt($deadline)) {
-                return 'Terlambat';
-            }
-            // Jika proyek dikumpulkan sebelum deadline → Tepat Waktu
-            return 'Tepat Waktu';
-        }
-
-        // Jika belum approved dan sudah melewati deadline → Terlambat
-        if ($today->gt($deadline)) {
+    if ($this->status === 'approved') {
+        if ($submitted && $submitted->gt($deadline)) {
             return 'Terlambat';
         }
-
-        // Default: masih tepat waktu
         return 'Tepat Waktu';
     }
 
-    // ✅ Badge warna otomatis
-    public function getDeadlineBadgeClassAttribute()
-    {
-        if (in_array($this->status, ['draft', 'rejected'])) {
-            return 'secondary';
-        }
+    if ($deadline->isPast()) return 'Terlambat';
 
-        if (empty($this->deadline)) {
-            return 'secondary';
-        }
+    return 'Tepat Waktu';
+}
 
-        if ($this->status === 'pending') {
-            return 'warning';
-        }
 
-        $deadline = Carbon::parse($this->deadline);
-        $created = Carbon::parse($this->created_at);
-
-        // 🔹 Jika approved tapi dibuat/melewati deadline → merah (terlambat)
-        if ($this->status === 'approved' && $created->gt($deadline)) {
-            return 'danger';
-        }
-
-        // 🔹 Jika approved dan tepat waktu → hijau
-        if ($this->status === 'approved') {
-            return 'success';
-        }
-
-        // 🔹 Jika lewat deadline dan belum approved → merah
-        if ($this->deadline->isPast() && $this->status !== 'approved') {
-            return 'danger';
-        }
-
+   public function getDeadlineBadgeClassAttribute()
+{
+    if (in_array($this->status, ['draft', 'rejected'])) {
         return 'secondary';
     }
+
+    if (empty($this->deadline)) {
+        return 'secondary';
+    }
+
+    if ($this->status === 'pending') {
+        return 'warning';
+    }
+
+    $deadline = Carbon::parse($this->deadline);
+    $submitted = $this->submitted_at ? Carbon::parse($this->submitted_at) : null;
+
+    // STATUS: APPROVED
+    if ($this->status === 'approved') {
+        if ($submitted && $submitted->gt($deadline)) {
+            return 'danger'; // Terlambat
+        }
+        return 'success'; // Tepat waktu
+    }
+
+    // Belum approved tapi lewat deadline → merah
+    if ($deadline->isPast() && $this->status !== 'approved') {
+        return 'danger';
+    }
+
+    return 'secondary';
+}
+
 }
