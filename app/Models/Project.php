@@ -40,7 +40,10 @@ class Project extends Model
     // ✅ Accessor status deadline
    public function getDeadlineStatusAttribute()
 {
-    if ($this->status === 'draft') return 'Belum Dikirim';
+    if (in_array($this->status, ['draft', 'rejected'])) {
+        return 'Belum Dikirim'; // ⬅️ ditolak dianggap draft
+    }
+
     if (!$this->deadline) return 'Tidak Ada Deadline';
 
     $deadline = Carbon::parse($this->deadline);
@@ -64,7 +67,7 @@ class Project extends Model
    public function getDeadlineBadgeClassAttribute()
 {
     if (in_array($this->status, ['draft', 'rejected'])) {
-        return 'secondary';
+        return 'secondary'; // ⬅️ rejected dianggap draft
     }
 
     if (empty($this->deadline)) {
