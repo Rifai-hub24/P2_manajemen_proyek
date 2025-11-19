@@ -27,6 +27,9 @@ class AuthController extends Controller
                     ->first();
 
         if ($user && Hash::check($password, $user->password)) {
+            if ($user->role === 'keluar') {
+                return back()->with('error', '⚠️ User ini telah keluar dari perusahaan.');
+            }
             Auth::login($user);
             $request->session()->regenerate();
 

@@ -346,6 +346,7 @@
                     <option value="team_lead" {{ $user->role == 'team_lead' ? 'selected' : '' }}>Team Lead</option>
                     <option value="developer" {{ $user->role == 'developer' ? 'selected' : '' }}>Developer</option>
                     <option value="designer" {{ $user->role == 'designer' ? 'selected' : '' }}>Designer</option>
+                    <option value="keluar" {{ $user->role == 'keluar' ? 'selected' : '' }}>Keluar</option>
                   </select>
                   <button type="submit" class="btn btn-edit">
                     <i class="bi bi-pencil-square"></i>
@@ -358,9 +359,13 @@
               </div>
             @endif
 
-            @if(!(Auth::user()->role == 'admin' && $user->role == 'admin'))
+           @if($user->role === 'keluar')
+              <div class="alert alert-secondary text-center py-2 mt-auto small mb-0">
+                <i class="bi bi-person-x"></i> User ini telah keluar
+              </div>
+            @elseif(!(Auth::user()->role == 'admin' && $user->role == 'admin'))
               <form action="{{ route('users.destroy', $user->user_id) }}" method="POST"
-                    onsubmit="return confirm('Yakin ingin menghapus user {{ $user->username }}?')" class="mt-auto">
+                onsubmit="return confirm('Yakin ingin menghapus user {{ $user->username }}?')" class="mt-auto">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-delete w-100 btn-modern">

@@ -65,7 +65,7 @@ class UserController extends Controller
     public function updateRole(Request $request, User $user)
     {
         $request->validate([
-            'role' => 'required|in:admin,team_lead,developer,designer',
+            'role' => 'required|in:admin,team_lead,developer,designer,keluar',
         ]);
 
         $currentUser = Auth::user();
@@ -100,6 +100,11 @@ class UserController extends Controller
         // Cegah admin hapus diri sendiri
         if ($currentUser->user_id === $user->user_id) {
             return back()->with('error', '⚠️ Anda tidak dapat menghapus diri sendiri.');
+        }
+         
+        // Cegah hapus jika user pernah bergabung ke project
+        if ($user->projects()->exists()) {  // pastikan ada relasi projects() di model User
+            return back()->with('error', '⚠️ User ini pernah bergabung ke project dan tidak bisa dihapus.');
         }
 
         $user->delete();
