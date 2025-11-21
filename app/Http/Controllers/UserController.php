@@ -111,4 +111,17 @@ class UserController extends Controller
 
         return back()->with('success', "🗑️ User {$user->username} berhasil dihapus.");
     }
+    public function generateResetCode($userId)
+    {
+        $user = User::findOrFail($userId);
+
+        // Generate PIN 6 digit
+        $pin = rand(100000, 999999);
+
+        // Simpan ke database
+        $user->reset_code = $pin;
+        $user->save();
+
+        return back()->with('success', "PIN Reset untuk {$user->username}: $pin");
+    }
 }

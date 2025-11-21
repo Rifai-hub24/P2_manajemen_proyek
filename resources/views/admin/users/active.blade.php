@@ -10,13 +10,13 @@
   <style>
     /* 🌈 Tema Modern & Elegan */
     :root {
-      --bg-main: #f3f6fb;           /* background lembut abu kebiruan */
-      --bg-card: #ffffff;           /* card putih bersih */
-      --text-dark: #1e293b;         /* teks utama */
-      --text-muted: #6b7280;        /* teks sekunder */
-      --primary: #2563eb;           /* biru utama */
-      --primary-soft: #dbeafe;      /* biru lembut */
-      --border: #e5e7eb;            /* garis halus */
+      --bg-main: #f3f6fb;
+      --bg-card: #ffffff;
+      --text-dark: #1e293b;
+      --text-muted: #6b7280;
+      --primary: #2563eb;
+      --primary-soft: #dbeafe;
+      --border: #e5e7eb;
       --shadow: 0 4px 16px rgba(0,0,0,0.05);
       --hover-shadow: 0 8px 20px rgba(37,99,235,0.15);
       --primary-gradient: linear-gradient(135deg, #2563eb, #1e3a8a);
@@ -89,7 +89,6 @@
       margin-bottom: 1.4rem;
     }
 
-    /* 🔹 Profil Lingkaran */
     .user-icon {
       width: 60px;
       height: 60px;
@@ -129,7 +128,7 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(37,99,235,0.25);
     }
-    /* Tombol Gradasi */
+
     .btn-gradient {
       background: var(--primary-gradient);
       color: white;
@@ -190,89 +189,39 @@
 
     /* ✨ Animasi Halus */
     @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(10px);}
-      to {opacity: 1; transform: translateY(0);}
+      from {opacity: 0; transform: translateY(10px);} 
+      to {opacity: 1; transform: translateY(0);} 
     }
 
     .fade-in {
       animation: fadeIn 0.6s ease forwards;
     }
-    
+
     /* 📱 Responsive Design */
     @media (max-width: 768px) {
-    /* Spasi agar konten tidak mepet di tepi */
-      .container {
-        padding: 0 1rem;
-      }
-
-    /* Susun elemen filter ke bawah di layar kecil */
-      .filter-section .row > * {
-        flex: 0 0 100%;
-        max-width: 100%;
-      }
-
-      .filter-section {
-        padding: 16px;
-      }
-
-      .filter-section button {
-        margin-top: 0.5rem;
-      }
+      .container { padding: 0 1rem; }
+      .filter-section .row > * { flex: 0 0 100%; max-width: 100%; }
+      .filter-section { padding: 16px; }
+      .filter-section button { margin-top: 0.5rem; }
     }
 
     @media (max-width: 576px) {
-    /* Ukuran card disesuaikan untuk HP */
-      .user-card {
-        padding: 1.2rem;
-      }
-
-      .user-icon {
-        width: 50px;
-        height: 50px;
-        margin-right: 12px;
-      }
-
-      .user-icon i {
-        font-size: 1.6rem;
-      }
-
-      h5.card-title {
-        font-size: 1rem;
-      }
-
-      .card-subtitle {
-        font-size: 0.85rem;
-      }
-
-      /* 🔹 Atur ulang header: tombol di atas judul */
-      .d-flex.mb-4 {
-        flex-direction: column-reverse; /* tombol di atas judul */
-        align-items: flex-start; /* tetap di kiri */
-        gap: 0.75rem;
-      }
-
-      /* 🔹 Judul di tengah */
-      h2.text-dark {
-        text-align: center;
-        width: 100%;
-      }
-
-      /* 🔹 Tombol kembali tidak full dan agak ke kanan */
-      .btn-gradient.btn-modern {
-        width: auto;
-        align-self: flex-start;
-        margin-left: 12px; /* geser sedikit ke kanan */
-      }
+      .user-card { padding: 1.2rem; }
+      .user-icon { width: 50px; height: 50px; margin-right: 12px; }
+      .user-icon i { font-size: 1.6rem; }
+      h5.card-title { font-size: 1rem; }
+      .card-subtitle { font-size: 0.85rem; }
+      .d-flex.mb-4 { flex-direction: column-reverse; align-items: flex-start; gap: 0.75rem; }
+      h2.text-dark { text-align: center; width: 100%; }
+      .btn-gradient.btn-modern { width: auto; align-self: flex-start; margin-left: 12px; }
     }
-
-
   </style>
 </head>
 <body>
   <div class="container fade-in">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="text-dark">
+      <h2 class="text-dark m-0">
         <i class="bi bi-people-fill text-primary"></i> Daftar User Aktif
       </h2>
       <a href="{{ route('dashboard') }}" class="btn btn-gradient btn-modern">
@@ -321,11 +270,9 @@
     <div class="row">
       @forelse($users as $user)
         <div class="col-md-6 col-lg-4 mb-4">
-          <div class="user-card">
+          <div class="user-card d-flex flex-column">
             <div class="user-header">
-              <div class="user-icon">
-                <i class="bi bi-person-fill"></i>
-              </div>
+              <div class="user-icon"><i class="bi bi-person-fill"></i></div>
               <div>
                 <h5 class="card-title">{{ $user->full_name }}</h5>
                 <div class="card-subtitle">{{ $user->username }}</div>
@@ -336,7 +283,12 @@
             <p class="mb-1"><i class="bi bi-list-check"></i> Status: <span class="text-muted">{{ $user->current_task_status ?? 'Idle' }}</span></p>
             <p class="mb-3"><i class="bi bi-person-badge"></i> Role: <span class="text-muted">{{ $user->role }}</span></p>
 
-            @if(!(Auth::user()->role == 'admin' && $user->role == 'admin'))
+            @php
+              $isAdminAksesUserAdmin = (Auth::user()->role === 'admin' && $user->role === 'admin');
+            @endphp
+
+            {{-- Edit Role --}}
+            @if(!$isAdminAksesUserAdmin)
               <form action="{{ route('users.updateRole', $user->user_id) }}" method="POST" class="mb-2">
                 @csrf
                 @method('PUT')
@@ -359,13 +311,23 @@
               </div>
             @endif
 
-           @if($user->role === 'keluar')
-              <div class="alert alert-secondary text-center py-2 mt-auto small mb-0">
+            {{-- Generate Reset PIN --}}
+            <form action="{{ route('admin.generateReset', $user->user_id) }}" method="POST" class="mb-2">
+              @csrf
+              <button type="submit" class="btn btn-warning w-100 btn-modern"
+                onclick="return confirm('Generate PIN untuk {{ $user->username }}?')">
+                <i class="bi bi-key-fill"></i> Generate Reset PIN
+              </button>
+            </form>
+
+            {{-- Hapus User / Keluar --}}
+            @if($user->role === 'keluar')
+              <div class="alert alert-secondary text-center py-2 mt-1 small mb-0">
                 <i class="bi bi-person-x"></i> User ini telah keluar
               </div>
-            @elseif(!(Auth::user()->role == 'admin' && $user->role == 'admin'))
+            @elseif(!$isAdminAksesUserAdmin)
               <form action="{{ route('users.destroy', $user->user_id) }}" method="POST"
-                onsubmit="return confirm('Yakin ingin menghapus user {{ $user->username }}?')" class="mt-auto">
+                onsubmit="return confirm('Yakin ingin menghapus user {{ $user->username }}?')" class="mt-1">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-delete w-100 btn-modern">
@@ -373,7 +335,7 @@
                 </button>
               </form>
             @else
-              <button class="btn btn-secondary btn-sm w-100 mt-auto" disabled>
+              <button class="btn btn-secondary btn-sm w-100 mt-1" disabled>
                 <i class="bi bi-lock"></i> Tidak bisa hapus admin lain
               </button>
             @endif

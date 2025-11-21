@@ -24,6 +24,12 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/register', [RegisterController::class, 'showRegister'])->name('register');
 Route::post('/register', [RegisterController::class, 'register'])->name('register.post');
 
+Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])
+    ->name('forgot');
+
+Route::post('/forgot-password', [AuthController::class, 'processForgotPassword'])
+    ->name('forgot.process');
+
 // PROTECTED ROUTES
 Route::middleware('auth')->group(function () {
 
@@ -68,9 +74,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/notifications', [AdminNotificationController::class, 'index'])->name('admin.notifications');
         Route::post('/admin/notifications/dismiss', [AdminNotificationController::class, 'dismiss'])->name('admin.notifications.dismiss');
         Route::get('/admin/notifications/count', [AdminNotificationController::class, 'count'])->name('admin.notifications.count');
-
-
-
+        Route::post('/admin/user/{id}/reset-pin', [UserController::class, 'generateResetCode'])->name('admin.generateReset');
     });
 
    // Team Lead
@@ -187,5 +191,6 @@ Route::middleware('auth')->group(function () {
        ->name('comments.subtask.store');
    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+  
    });
 });

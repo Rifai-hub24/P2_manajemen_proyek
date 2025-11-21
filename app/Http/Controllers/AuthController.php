@@ -57,4 +57,33 @@ class AuthController extends Controller
 
         return redirect()->route('login');
     }
+    public function processForgotPassword(Request $request)
+{
+    $request->validate([
+        'username' => 'required',
+        'reset_code' => 'required',
+        'password' => 'required|confirmed|min:6'
+    ]);
+
+    // cek apakah user dan PIN cocok
+    $user = User::where('username', $request->username)
+                ->where('reset_code', $request->reset_code)
+                ->first();
+
+    if (!$user) {
+        return back()->with('error', 'Username atau PIN reset salah!');
+    }
+
+    // update password
+    $user->password = Hash::make($request->password);
+    $user->reset_code = null; // reset PIN setelah digunakan
+    $user->save();
+
+    return redirect()->route('login')->with('success', 'Password berhasil direset!');
+}
+// 🔹 Tampilkan form lupa password
+public function showForgotForm()
+{
+    return view('auth.forgot-password');
+}
 }
