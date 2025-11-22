@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 class ProjectMemberController extends Controller
 {
     /**
-     * Tambahkan anggota baru ke proyek
+     * Tambah anggota ke project
      */
     public function addMember(Request $request, $projectId)
     {
@@ -24,101 +24,88 @@ class ProjectMemberController extends Controller
         }
 
         $user = User::where('username', $request->username)->first();
+        if (!$user) return back()->with('error', '❌ User tidak ditemukan!');
 
-        if (!$user) {
-            return back()->with('error', '❌ User tidak ditemukan!');
-        }
-       
-        // ✅ Batasi role yang boleh gabung ke project
         $allowedRoles = ['admin','team_lead','developer','designer'];
         if (!in_array($user->role, $allowedRoles)) {
-           return back()->with('error', '🚫 Role user tidak valid untuk bergabung ke project.');
+            return back()->with('error', '🚫 Role user tidak valid untuk bergabung ke project.');
         }
-        
-        // ✅ Cek kalau project sudah ada admin
+
         if ($user->role === 'admin' && $project->members->where('role','admin')->count() > 0) {
-           return back()->with('error', '⚠️ Project ini sudah memiliki seorang Admin.');
+            return back()->with('error', '⚠️ Project ini sudah memiliki Admin.');
         }
 
-        // Kalau user bukan admin dan statusnya sudah working → tolak
         if ($user->role !== 'admin' && $user->current_task_status === 'working') {
-            return back()->with('error', '⚠️ User sedang bekerja di project lain, tunggu sampai project di-approve admin!');
+            return back()->with('error', '⚠️ User sedang bekerja di project lain.');
         }
 
-        // Tambahkan user ke project
+        // 🔥 Simpan role aslinya ke "role_at_join"
         ProjectMember::create([
-            'project_id' => $projectId,
-            'user_id'    => $user->user_id,
-            'role'       => $user->role === 'admin' ? 'admin' : 'member',
-            'joined_at'  => now(),
+            'project_id'   => $projectId,
+            'user_id'      => $user->user_id,
+            'role'         => $user->role === 'admin' ? 'admin' : 'member',
+            'role_at_join' => $user->role,     // <-- penting!
+            'joined_at'    => now(),
         ]);
 
-        // Update status user jadi working (kecuali admin)
         if ($user->role !== 'admin') {
             $user->update(['current_task_status' => 'working']);
         }
 
         return back()->with('success', '✅ Anggota berhasil ditambahkan ke project!');
     }
-     /**
-     * Update User
+
+
+    /**
+     * Update anggota project
      */
     public function updateUser(Request $request, $memberId)
-{
-    $member = ProjectMember::with('project')->findOrFail($memberId);
-    // ❌ Jika yang mau diedit adalah admin, pastikan hanya bisa diganti dengan admin lain
-    if ($member->user->role === 'admin') {
+    {
+        $member = ProjectMember::with('project', 'user')->findOrFail($memberId);
+
+        if ($member->project->status === 'approved') {
+            return back()->with('error', '❌ Project sudah approved, tidak bisa edit anggota.');
+        }
+
+        // Cegah edit ketika subtask jalan
+        $hasStarted = Subtask::whereHas('card.board', function($q) use ($member) {
+            $q->where('project_id', $member->project->project_id);
+        })->where('status', 'in_progress')->exists();
+
+        if ($hasStarted) return back()->with('error', '⚠️ Tidak bisa edit anggota, subtask sudah berjalan.');
+
+        $request->validate([
+            'username' => 'required|string|exists:users,username'
+        ]);
+
         $newUser = User::where('username', $request->username)->first();
+        if (!$newUser) return back()->with('error', '❌ User tidak ditemukan.');
 
-        if (!$newUser) {
-            return back()->with('error', '❌ User tidak ditemukan.');
+        $allowedRoles = ['admin','team_lead','developer','designer'];
+        if (!in_array($newUser->role, $allowedRoles)) {
+            return back()->with('error', '🚫 Role user tidak valid.');
         }
 
-        // Jika user baru bukan admin → tolak
-        if ($newUser->role !== 'admin') {
-            return back()->with('error', '🚫 Admin hanya bisa diganti dengan user ber-role admin.');
+        // Admin hanya diganti admin
+        if ($member->role === 'admin' && $newUser->role !== 'admin') {
+            return back()->with('error', '🚫 Admin hanya bisa diganti admin.');
         }
-    }
-    
-    // ❌ Cek jika ada subtask in_progress di project ini
-    $hasStarted = Subtask::whereHas('card.board', function($q) use ($member) {
-        $q->where('project_id', $member->project->project_id);
-    })->where('status', 'in_progress')->exists();
 
-    if ($hasStarted) {
-        return back()->with('error', '⚠️ Tidak bisa edit anggota, subtask sudah berjalan.');
-    }
+        // ganti admin tetapi project sudah ada admin lain
+        if ($newUser->role === 'admin' &&
+            $member->project->members
+                ->where('role','admin')
+                ->where('member_id','!=',$member->member_id)
+                ->count() > 0) {
 
-    if ($member->project->status === 'approved') {
-        return back()->with('error', '❌ Project sudah approved, tidak bisa edit anggota.');
-    }
+            return back()->with('error', '⚠️ Project sudah memiliki admin.');
+        }
 
-    $request->validate([
-        'username' => 'required|string|exists:users,username'
-    ]);
+        if ($newUser->role !== 'admin' && $newUser->current_task_status === 'working') {
+            return back()->with('error', '⚠️ User sedang bekerja di project lain.');
+        }
 
-    $newUser = User::where('username', $request->username)->first();
-
-    if (!$newUser) {
-        return back()->with('error', '❌ User tidak ditemukan.');
-    }
-   
-    // ✅ Batasi role yang boleh gabung ke project
-    $allowedRoles = ['admin','team_lead','developer','designer'];
-    if (!in_array($newUser->role, $allowedRoles)) {
-        return back()->with('error', '🚫 Role user tidak valid untuk bergabung ke project.');
-    }
-    
-    // ✅ Jika user baru admin → pastikan project belum ada admin (kecuali member yang diganti admin juga)
-    if ($newUser->role === 'admin' && $member->project->members->where('role','admin')->where('member_id','!=',$member->member_id)->count() > 0) {
-        return back()->with('error', '⚠️ Project ini sudah memiliki Admin.');
-    }
-
-    // Pastikan user baru bukan sedang working di project lain
-    if ($newUser->role !== 'admin' && $newUser->current_task_status === 'working') {
-        return back()->with('error', '⚠️ User sedang bekerja di project lain.');
-    }
-    // 🔥 Hapus semua card milik user lama di project ini
+        // Hapus card user lama
         $cards = Card::whereHas('board', function($q) use ($member) {
                 $q->where('project_id', $member->project->project_id);
             })
@@ -131,62 +118,58 @@ class ProjectMemberController extends Controller
             $card->delete();
         }
 
-    // Reset status user lama jadi idle (kecuali admin)
-    if ($member->user->role !== 'admin') {
-        $member->user->update(['current_task_status' => 'idle']);
+        // Reset status user lama
+        if ($member->user->role !== 'admin') {
+            $member->user->update(['current_task_status' => 'idle']);
+        }
+
+        // 🔥 Update user baru TANPA mengubah role_at_join
+        $member->update([
+            'user_id' => $newUser->user_id,
+            'role'    => $newUser->role === 'admin' ? 'admin' : 'member',
+            // role_at_join tetap → tidak dihapus, tidak diganti
+        ]);
+
+        if ($newUser->role !== 'admin') {
+            $newUser->update(['current_task_status' => 'working']);
+        }
+
+        return back()->with('success', '✅ Anggota berhasil diganti!');
     }
-
-    // Update user_id ke user baru
-    $member->update([
-        'user_id' => $newUser->user_id,
-        'role'    => $newUser->role === 'admin' ? 'admin' : 'member',
-    ]);
-
-    // Update status user baru jadi working (kecuali admin)
-    if ($newUser->role !== 'admin') {
-        $newUser->update(['current_task_status' => 'working']);
-    }
-
-    return back()->with('success', '✅ Anggota berhasil diganti!');
-}
 
 
     /**
-     * Hapus anggota
+     * Hapus anggota project
      */
     public function deleteMember($memberId)
     {
         $member = ProjectMember::with(['project', 'user'])->findOrFail($memberId);
-        // ❌ Cegah penghapusan admin
+
         if ($member->user->role === 'admin') {
-            return back()->with('error', '🚫 Admin tidak dapat dihapus dari proyek.');
+            return back()->with('error', '🚫 Admin tidak dapat dihapus.');
         }
-        // ❌ Cek jika ada subtask in_progress di project ini
+
         $hasStarted = Subtask::whereHas('card.board', function($q) use ($member) {
             $q->where('project_id', $member->project->project_id);
         })->where('status', 'in_progress')->exists();
 
         if ($hasStarted) {
             return back()->with('error', '⚠️ Tidak bisa hapus anggota, subtask sudah berjalan.');
-       }
-
-        if ($member->project->status === 'approved') {
-            return back()->with('error', '❌ Project sudah approved, tidak bisa hapus anggota.');
         }
-        // 🔥 Hapus semua card milik user ini dalam project
+
+        // hapus card user
         $cards = Card::whereHas('board', function($q) use ($member) {
-                $q->where('project_id', $member->project->project_id);
-            })
-            ->whereHas('assignments', function($q) use ($member) {
-                $q->where('user_id', $member->user->user_id);
-            })->get();
+            $q->where('project_id', $member->project->project_id);
+        })
+        ->whereHas('assignments', function($q) use ($member) {
+            $q->where('user_id', $member->user->user_id);
+        })->get();
 
         foreach ($cards as $card) {
             CardAssignment::where('card_id', $card->card_id)->delete();
             $card->delete();
         }
 
-        // reset status user jadi idle kalau bukan admin
         if ($member->user->role !== 'admin') {
             $member->user->update(['current_task_status' => 'idle']);
         }
@@ -195,45 +178,43 @@ class ProjectMemberController extends Controller
 
         return back()->with('success', '🗑️ Anggota berhasil dihapus!');
     }
+
+
+    // TEAM VIEW
     public function myTeam()
-{
-    $user = auth()->user();
+    {
+        $user = auth()->user();
 
-    // Cari project yang diikuti user ini
-    $projects = Project::whereHas('members', function($q) use ($user) {
-        $q->where('user_id', $user->user_id);
-    })->with(['members.user'])->get();
+        $projects = Project::whereHas('members', function($q) use ($user) {
+            $q->where('user_id', $user->user_id);
+        })->with(['members.user'])->get();
 
-    return view('teamlead.myteam', compact('projects', 'user'));
-}
+        return view('teamlead.myteam', compact('projects','user'));
+    }
 
-public function developerTeam()
-{
-    $user = auth()->user();
+    public function developerTeam()
+    {
+        $user = auth()->user();
 
-    // Cari semua project yang diikuti developer ini
-    $projects = Project::whereHas('members', function($q) use ($user) {
-        $q->where('user_id', $user->user_id);
-    })->with(['members.user', 'members'])->get();
+        $projects = Project::whereHas('members', function($q) use ($user) {
+            $q->where('user_id', $user->user_id);
+        })->with(['members.user'])->get();
 
-    // Jika semua project sudah approved → anggap belum ada project aktif
-    $hasApprovedOnly = $projects->every(fn($p) => $p->status === 'approved');
+        $hasApprovedOnly = $projects->every(fn($p) => $p->status === 'approved');
 
-    return view('developer.myteam', compact('projects', 'user', 'hasApprovedOnly'));
-}
-public function designerTeam()
-{
-    $user = auth()->user();
+        return view('developer.myteam', compact('projects','user','hasApprovedOnly'));
+    }
 
-    // Cari semua project yang diikuti designer ini
-    $projects = Project::whereHas('members', function($q) use ($user) {
-        $q->where('user_id', $user->user_id);
-    })->with(['members.user', 'members'])->get();
+    public function designerTeam()
+    {
+        $user = auth()->user();
 
-    // Jika semua project sudah approved → anggap belum ada project aktif
-    $hasApprovedOnly = $projects->every(fn($p) => $p->status === 'approved');
+        $projects = Project::whereHas('members', function($q) use ($user) {
+            $q->where('user_id', $user->user_id);
+        })->with(['members.user'])->get();
 
-    return view('designer.myteam', compact('projects', 'user', 'hasApprovedOnly'));
-}
+        $hasApprovedOnly = $projects->every(fn($p) => $p->status === 'approved');
 
+        return view('designer.myteam', compact('projects','user','hasApprovedOnly'));
+    }
 }

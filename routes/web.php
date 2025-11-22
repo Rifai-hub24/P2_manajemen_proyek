@@ -75,6 +75,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/notifications/dismiss', [AdminNotificationController::class, 'dismiss'])->name('admin.notifications.dismiss');
         Route::get('/admin/notifications/count', [AdminNotificationController::class, 'count'])->name('admin.notifications.count');
         Route::post('/admin/user/{id}/reset-pin', [UserController::class, 'generateResetCode'])->name('admin.generateReset');
+       Route::get('/monitoring/{id}/chart', [MonitoringController::class, 'chart'])->name('monitoring.chart');
     });
 
    // Team Lead

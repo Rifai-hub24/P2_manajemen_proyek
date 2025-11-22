@@ -531,6 +531,11 @@
                 <button class="btn btn-primary btn-modern flex-fill flip-btn">
                   <i class="bi bi-bar-chart-line"></i> Lihat Progres
                 </button>
+                <!-- Tombol Grafik -->
+                <a href="{{ route('monitoring.chart', $project->project_id) }}"
+                    class="btn btn-success btn-modern flex-fill"style="color:#fff; font-weight:600;">
+                    <i class="bi bi-graph-up"></i> Grafik
+                </a>
                 <a href="{{ route('monitoring.show', $project->project_id) }}" class="btn btn-outline-secondary btn-modern flex-fill">
                   <i class="bi bi-info-circle"></i> Detail
                 </a>

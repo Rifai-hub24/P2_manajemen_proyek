@@ -11,7 +11,7 @@ class ProjectMember extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'project_id', 'user_id', 'role', 'joined_at'
+        'project_id', 'user_id', 'role','role_at_join', 'joined_at'
     ];
       // Relasi ke User
     public function user()
