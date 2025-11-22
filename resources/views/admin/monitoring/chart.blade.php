@@ -260,6 +260,16 @@
             cursor: pointer;
             white-space: nowrap;
             margin-bottom: 12px;
+            width: auto; /* Tidak full width */
+        }
+
+        .back-button-mobile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .back-button-mobile:active {
+            transform: translateY(0);
         }
 
         /* Tablet */
@@ -361,10 +371,9 @@
             body { padding: 8px; }
             
             .back-button-mobile {
-                padding: 8px 16px;
-                font-size: 0.85rem;
-                width: 100%;
-                justify-content: center;
+                padding: 8px 12px;
+                font-size: 0.8rem;
+                width: auto; /* Tetap tidak full width */
             }
             
             .summary-grid { 
@@ -398,14 +407,15 @@
         <!-- Tombol Kembali Mobile -->
         <a href="{{ route('monitoring.index') }}" class="back-button-mobile" id="mobileBackButton">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8l-4 4 4 4M16 12H8"/>
             </svg>
             Kembali ke Monitoring
         </a>
 
         <header>
             <!-- Tombol Kembali Desktop -->
-           <a href="{{ route('monitoring.index') }}" class="back-button" id="desktopBackButton">
+            <a href="{{ route('monitoring.index') }}" class="back-button" id="desktopBackButton">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"/>
                     <path d="M12 8l-4 4 4 4M16 12H8"/>
@@ -416,7 +426,7 @@
             <div class="header-content">
                 <h1>
                     <span>📊</span> 
-                    Dashboard Monitoring — 
+                    Dashboard Monitoring 
                     <span class="project-name">{{ $project->project_name }}</span>
                 </h1>
                 <p class="subtitle">Visualisasi progress dan produktivitas tim secara real-time</p>
