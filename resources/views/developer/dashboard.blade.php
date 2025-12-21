@@ -317,9 +317,9 @@
   /* Atur lebar tiap kolom */
   .table th:nth-child(1), .table td:nth-child(1) { width: 15%; }  /* Subtask */
   .table th:nth-child(2), .table td:nth-child(2) { width: 28%; }  /* Deskripsi (paling lebar) */
-  .table th:nth-child(3), .table td:nth-child(3) { width: 9%; }  /* Estimasi */
+  .table th:nth-child(3), .table td:nth-child(3) { width: 11%; }  /* Estimasi */
   .table th:nth-child(4), .table td:nth-child(4) { width: 8%; }  /* Aktual */
-  .table th:nth-child(5), .table td:nth-child(5) { width: 10%; }  /* Status */
+  .table th:nth-child(5), .table td:nth-child(5) { width: 12%; }  /* Status */
   .table th:nth-child(6), .table td:nth-child(6) { width: 17%; }  /* Aksi (lebar kedua) */
   .table th:nth-child(7), .table td:nth-child(7) { width: 15%; }   /* Komentar */
 
