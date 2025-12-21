@@ -288,9 +288,9 @@
     /* Atur lebar tiap kolom */
     .table th:nth-child(1), .table td:nth-child(1) { width: 15%; }  
     .table th:nth-child(2), .table td:nth-child(2) { width: 28%; }  
-    .table th:nth-child(3), .table td:nth-child(3) { width: 9%; } 
+    .table th:nth-child(3), .table td:nth-child(3) { width: 11%; } 
     .table th:nth-child(4), .table td:nth-child(4) { width: 8%; }  
-    .table th:nth-child(5), .table td:nth-child(5) { width: 10%; } 
+    .table th:nth-child(5), .table td:nth-child(5) { width: 11%; } 
     .table th:nth-child(6), .table td:nth-child(6) { width: 17%; }  
     .table th:nth-child(7), .table td:nth-child(7) { width: 15%; }   
 
